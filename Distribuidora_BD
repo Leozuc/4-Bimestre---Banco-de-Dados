@@ -1,4 +1,5 @@
 
+
 -- JOGANDO FORA O BANCO 
 drop database dbDistribuiaaraLM;
 
@@ -696,4 +697,157 @@ select tbclientepf.IdCli as 'Código', Nomecli as 'Nome', cpf  as 'CPF', rg as '
 select * from tbcliente inner join tbClientepj on tbcliente.IdCli = tbClientepj.IdCli inner join tbendereco on tbcliente.cep = tbendereco.CEP;
 
 -- EXERCÍCIO 37
-select * from tbcliente inner join tbendereco  on tbcliente.cep = tbendereco.cep inner join tbBairro on tbendereco.IdBairro = tbBairro.IdBairro Inner join tbCidade  on tbendereco.IdCidade = tbcidade.IdCidade  inner join tbuf  on tbendereco.IdUF = tbUF.IdUF;
+ select  
+     tbcliente.idcli, 
+     tbcliente.nomecli, 
+     tbcliente.numend, 
+     tbcliente.compend, 
+     tbcliente.cep, 
+     tbbairro.bairro, 
+     tbcidade.cidade, 
+     tbuf.uf 
+ from 
+     tbcliente 
+         inner join 
+     tbclientepj on tbcliente.idcli = tbclientepj.idcli 
+         inner join 
+     tbendereco on tbendereco.cep = tbcliente.cep 
+         inner join 
+     tbbairro on tbbairro.idbairro = tbendereco.idbairro 
+         inner join 
+     tbcidade on tbcidade.idcidade = tbendereco.idcidade 
+         inner join 
+     tbuf on tbuf.iduf = tbendereco.iduf; 
+  
+-- EXERCÍCIO 38
+delimiter $$ 
+create procedure spSelectClientePFID(vIdCli int) 
+begin 
+     if exists (select * from tbClientePF where Idcli = vIdCli) then 
+     select 
+		tbcliente.idcli as "Código", 
+		tbcliente.nomecli as "Nome", 
+		tbclientepf.cpf as "CPF", 
+		tbclientepf.rg as "RG", 
+		tbclientepf.rgdig as "Digito", 
+		tbclientepf.nasc as "Data de Nascimento", 
+		tbcliente.cep as "CEP", 
+		tbendereco.logradouro as "Logradouro", 
+		tbcliente.numend as "Número", 
+		tbcliente.compend as "Complemento", 
+		tbbairro.bairro "Bairro", 
+		tbcidade.cidade "Cidade", 
+		tbuf.uf "UF" 
+	from 
+		tbcliente 
+			inner join 
+		tbclientepf on tbcliente.idcli = vIdCli 
+			inner join 
+		tbendereco on tbendereco.cep = tbcliente.cep 
+			inner join 
+		tbbairro on tbbairro.idbairro = tbendereco.idbairro 
+			inner join 
+		tbcidade on tbcidade.idcidade = tbendereco.idcidade 
+			inner join 
+		tbuf on tbuf.iduf = tbendereco.iduf limit 1;
+	else  
+		select "Cliente não cadastrado"; 
+	end if; 
+ end; 
+ $$ 
+ 
+select * from tbcliente;
+select * from tbclientepf;
+select * from tbendereco;
+select * from tbbairro;
+select * from tbcidade;
+select * from tbuf;
+
+call spSelectClientePFID(2);   
+call spSelectClientePFID(5); 
+  
+-- EXERCÍCIO-39
+select * from tbproduto;
+select * from tbitemvenda;
+
+select 
+   tbproduto.codbarras, 
+   tbproduto.nome, 
+   tbproduto.valorunitario, 
+   tbproduto.qtd, 
+   tbitemvenda.qtd, 
+   tbitemvenda.valoritem, 
+   tbitemvenda.codbarras,
+   tbitemvenda.numerovenda 
+from  
+   tbproduto  
+		left join  
+   tbitemvenda on tbproduto.codbarras = tbitemvenda.codbarras; 
+          
+-- EXERCÍCIO 40
+select * from tbcompra;
+select * from tbfornecedor;
+
+select  
+   tbcompra.notafiscal, 
+   tbcompra.datacompra, 
+   tbcompra.valortotal, 
+   tbcompra.qtdtotal, 
+   tbcompra.cod_fornecedor, 
+   tbfornecedor.codigo as "Código", 
+   tbfornecedor.cnpj, 
+   tbfornecedor.nome as "Nome", 
+   tbfornecedor.telefone as "Telefone" 
+from 
+	tbcompra 
+		right join 
+	tbfornecedor on tbfornecedor.codigo = tbcompra.cod_fornecedor; 
+            
+-- EXERCÍCIO 41
+select 
+    tbfornecedor.codigo as "Código",  
+    cnpj as "CNPJ",  
+    nome as "Nome",  
+    telefone as "Telefone"  
+from 
+	tbcompra 
+		right join 
+    tbfornecedor on tbcompra.cod_fornecedor = tbfornecedor.codigo where tbcompra.cod_fornecedor is null; 
+    
+-- EXERCÍCIO 42
+select * from tbCLiente;
+select * from tbvenda;
+select * from tbitemvenda;
+select * from tbproduto;
+select * from tbnotafiscal;
+
+select  
+     tbcliente.idcli, nomecli, datavenda, 
+     tbproduto.codbarras, 
+     tbproduto.nome, valorunitario 
+ from 
+     tbcliente 
+         inner join 
+     tbvenda on tbcliente.idcli = tbvenda.idcli 
+         inner join 
+     tbitemvenda on tbvenda.numerovenda = tbitemvenda.numerovenda 
+         inner join 
+     tbproduto on tbitemvenda.codbarras = tbproduto.codbarras 
+ where 
+     tbvenda.idcli is not null order by nomecli;
+  
+ /* ------ EXERCÍCIO 43 ------ */ 
+  
+ select distinct  
+     bairro 
+ from 
+     tbbairro 
+         left join 
+     tbendereco on tbbairro.idbairro = tbendereco.idbairro 
+         left join 
+     tbcliente on tbendereco.cep = tbcliente.cep 
+         left join 
+     tbvenda on tbcliente.idcli = tbvenda.idcli 
+ where 
+     tbvenda.idcli is null;         
+     
