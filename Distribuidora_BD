@@ -1,5 +1,4 @@
 
-
 -- JOGANDO FORA O BANCO 
 drop database dbDistribuiaaraLM;
 
@@ -451,6 +450,8 @@ call spInsertVenda("Pimpão",12345678910113,1,null);
 
 -- SELECT 
 select * from tbCliente;
+select * from tbEndereco;
+select * from tbBairro;
 select * from tbProduto;
 select * from tbVenda;
 select * from tbItemVenda;
@@ -755,18 +756,12 @@ begin
 	end if; 
  end; 
  $$ 
- 
-select * from tbcliente;
-select * from tbclientepf;
-select * from tbendereco;
-select * from tbbairro;
-select * from tbcidade;
-select * from tbuf;
 
 call spSelectClientePFID(2);   
-call spSelectClientePFID(5); 
+call spSelectClientePFID(5);
+call spSelectClientePFID(7); 
   
--- EXERCÍCIO-39
+-- EXERCÍCIO 39
 select * from tbproduto;
 select * from tbitemvenda;
 
@@ -787,7 +782,6 @@ from
 -- EXERCÍCIO 40
 select * from tbcompra;
 select * from tbfornecedor;
-
 select  
    tbcompra.notafiscal, 
    tbcompra.datacompra, 
@@ -824,7 +818,8 @@ select * from tbnotafiscal;
 select  
      tbcliente.idcli, nomecli, datavenda, 
      tbproduto.codbarras, 
-     tbproduto.nome, valorunitario 
+     tbproduto.nome, 
+     tbitemvenda.valoritem
  from 
      tbcliente 
          inner join 
@@ -835,11 +830,14 @@ select
      tbproduto on tbitemvenda.codbarras = tbproduto.codbarras 
  where 
      tbvenda.idcli is not null order by nomecli;
-  
- /* ------ EXERCÍCIO 43 ------ */ 
-  
- select distinct  
-     bairro 
+     
+-- EXERCÍCIO 43
+select * from tbbairro;
+select * from tbvenda;
+select * from tbcliente;
+select * from tbendereco;
+
+ select distinct bairro 
  from 
      tbbairro 
          left join 
@@ -849,5 +847,4 @@ select
          left join 
      tbvenda on tbcliente.idcli = tbvenda.idcli 
  where 
-     tbvenda.idcli is null;         
-     
+     tbvenda.idcli is null;      
